@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	Copyright (c) 2010 Obix Labs Limited
+	Redistribution and use in source and binary forms, 
+	with or without modification, are permitted provided 
+	that the following conditions are met:
+
+	*	Redistribution of source code must retain the above 
+		copyright notice, this list of conditions and the 
+		following disclaimer.
+	
+	*	Redistribution in binary form must reproduce the 
+		above copyright notice, this list of conditions 
+		and the following disclaimer in the documentation 
+		and/or other materials provided with the distribution.
+		
+	*	Neither the name of Obix Labs Limited nor the
+		names of its contributors may be used to endorse or 
+		promote products derived from this software without 
+		specific prior written permission.
+
+	
+	THIS SOFTWARE IS PROVIDED "AS IS," WITHOUT A WARRANTY OF 
+	ANY KIND. ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS 
+	AND WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY, 
+	FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT, 
+	ARE HEREBY EXCLUDED. OBIX LABS LIMITED ("Obix Labs") AND ITS 
+	LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE 
+	AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR 
+	ITS DERIVATIVES. IN NO EVENT WILL Obix Labs OR ITS LICENSORS BE 
+	LIABLE FOR ANY LOST REVENUE, PROFIT OR DATA, OR FOR DIRECT, 
+	INDIRECT, SPECIAL, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE 
+	DAMAGES, HOWEVER CAUSED AND REGARDLESS OF THE THEORY OF 
+	LIABILITY, ARISING OUT OF THE USE OF OR INABILITY TO USE THIS 
+	SOFTWARE, EVEN IF Obix Labs HAS BEEN ADVISED OF THE POSSIBILITY OF 
+	SUCH DAMAGES. 
+ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:aop="http://www.springframework.org/schema/aop"
+      xsi:schemaLocation="
+      	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+		
+	<bean 	id="monitorFactory"
+			class="org.latency4j.processing.AsynchronousLatencyMonitorFactory"
+			scope="singleton"
+			init-method="init">
+		<property name="configurationPath" 
+					value="CLASSPATH:/org/latency4j/spring/aop/epsilon-config.xml"/>			
+	</bean>
+	
+	<!-- Interceptor declarations -->	
+	<bean 	id="cappedTaskMonitor" class="org.latency4j.spring.Latency4JInterceptor" 
+			scope="singleton">
+		<property name="monitorFactory" ref="monitorFactory"/>
+		<property name="workCategory" value="InterceptedServiceCappedCategory"/>
+	</bean>
+	<bean 	id="statsTaskMonitor" class="org.latency4j.spring.Latency4JInterceptor" 
+			scope="singleton">
+		<property name="monitorFactory" ref="monitorFactory"/>
+		<property name="workCategory" value="InterceptedServiceStatsCategory"/>
+	</bean>
+
+	
+	<bean 	id="testService" class="org.latency4j.spring.MockService" 
+			scope="singleton"/>
+		
+		
+	<aop:config>
+		
+		<aop:aspect ref="cappedTaskMonitor">
+    		<aop:pointcut id="cappedOperationPointcut"
+        		expression="execution(* org.latency4j.spring.MockService.cappedTestService(..))"/>  
+        	<aop:around pointcut-ref="cappedOperationPointcut" method="monitor"/>	
+      	</aop:aspect>
+
+		<aop:aspect ref="cappedTaskMonitor">
+    		<aop:pointcut id="exceptionOperationPointcut"
+        		expression="execution(* org.latency4j.spring.MockService.exceptionService(..))"/>  
+        	<aop:around pointcut-ref="exceptionOperationPointcut" method="monitor"/>	
+      	</aop:aspect>
+      	      	
+		<aop:aspect ref="statsTaskMonitor">
+    		<aop:pointcut id="statsOperationPointcut"
+        		expression="execution(* org.latency4j.spring.MockService.statsTestService(..))"/>  
+        	<aop:around pointcut-ref="statsOperationPointcut" method="monitor"/>	
+      	</aop:aspect>
+	</aop:config>	
+		
+</beans>

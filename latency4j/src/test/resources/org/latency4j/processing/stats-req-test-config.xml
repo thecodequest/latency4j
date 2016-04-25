@@ -1,0 +1,28 @@
+<latency4j 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:noNamespaceSchemaLocation="latency4j.xsd">
+	<alertHandlers>
+		<alertHandler 
+			alertHandlerId="countingAlertHandler" 
+			className="org.latency4j.alert.CountingMockAlertHandler"/>		
+	</alertHandlers>
+	
+	<latencyRequirements>
+		<statisticalRequirement 			
+			workCategory="statsRequirementTestTask" 
+			observationsSignificanceBarrier="5"
+			toleranceLevel="0.1"
+			persistenceManagerClass="org.latency4j.persistence.NullPersistenceManager">
+			<alertHandlerId>countingAlertHandler</alertHandlerId>
+		</statisticalRequirement>
+		
+		<statisticalRequirement 			
+			workCategory="statsRequirementTestTaskWithIgnoreErrorsDisabled"
+			ignoreErrors="false" 
+			observationsSignificanceBarrier="5"
+			toleranceLevel="0.1"
+			persistenceManagerClass="org.latency4j.persistence.NullPersistenceManager">
+			<alertHandlerId>countingAlertHandler</alertHandlerId>
+		</statisticalRequirement>
+		
+	</latencyRequirements>
+</latency4j>

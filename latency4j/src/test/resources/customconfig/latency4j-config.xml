@@ -1,0 +1,40 @@
+<latency4j xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="latency4j.xsd">
+	<alertHandlers>
+		<alertHandler 
+			alertHandlerId="alertLogger" 
+			className="org.latency4j.alert.MissedTargetAlertLogger">
+			<parameters>
+				<entry>
+					<key>logLevel</key>
+					<value>INFO</value>
+				</entry>
+				<entry>
+					<key>logger.category</key>
+					<value>Epsilon-Test-Logger</value>
+				</entry>
+			</parameters>
+		</alertHandler>
+		<alertHandler 
+			alertHandlerId="countingAlertHandler" 
+			className="org.latency4j.alert.CountingMockAlertHandler"/>		
+	</alertHandlers>
+	
+	<latencyRequirements>
+		<cappedRequirement 			
+			workCategory="fixedRequirement" ignoreErrors="false"
+			expectedLatency="1"
+			persistenceManagerClass="org.latency4j.configuration.ConfigurationTestPersister">			
+			<alertHandlerId>alertLogger</alertHandlerId>			
+		</cappedRequirement>	
+
+		<statisticalRequirement 			
+			workCategory="statsRequirement" ignoreErrors="false"
+			observationsSignificanceBarrier="5"
+			toleranceLevel="0.1"
+			persistenceManagerClass="org.latency4j.persistence.NullPersistenceManager">			
+			<alertHandlerId>alertLogger</alertHandlerId>
+			<alertHandlerId>countingAlertHandler</alertHandlerId>
+		</statisticalRequirement>
+	</latencyRequirements>
+</latency4j>

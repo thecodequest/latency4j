@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:aop="http://www.springframework.org/schema/aop"
+      xsi:schemaLocation="
+      	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<bean class="org.latency4j.spring.Latency4JBeanPostProcessor">
+		<property name="monitorFactory" ref="monitorFactory"/>
+	</bean>
+
+	<bean 	id="monitorFactory"
+			class="org.latency4j.processing.AsynchronousLatencyMonitorFactory"
+			scope="singleton"
+			init-method="init">
+		<property 	name="configurationPath" 
+					value="CLASSPATH:/org/latency4j/spring/annotations/latency4j-config.xml"/>			
+	</bean>
+
+	<bean 	id="annotatedMockService"
+			class="org.latency4j.spring.AnnotatedMockService"/>
+	
+</beans>

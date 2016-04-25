@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:complexType name="latency4j">
+    <xs:sequence>
+      <xs:element name="alertHandlers" type="alertHandlerGroupConfig" minOccurs="0"/>
+      <xs:element name="latencyRequirements" type="latencyRequirementGroupConfig" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="alertHandlerGroupConfig">
+    <xs:sequence>
+      <xs:element name="alertHandler" type="alertHandlerConfiguration" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="alertHandlerConfiguration">
+    <xs:sequence>
+      <xs:element name="parameters">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="key" minOccurs="0" type="xs:string"/>
+                  <xs:element name="value" minOccurs="0" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="alertHandlerId" type="xs:string" use="required"/>
+    <xs:attribute name="className" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="latencyRequirementGroupConfig">
+    <xs:sequence>
+      <xs:element name="cappedRequirement" type="cappedRequirementConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="statisticalRequirement" type="statisticalRequirementConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="cappedRequirementConfiguration">
+    <xs:complexContent>
+      <xs:extension base="latencyRequirementConfiguration">
+        <xs:sequence/>
+        <xs:attribute name="expectedLatency" type="xs:long"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="latencyRequirementConfiguration" abstract="true">
+    <xs:sequence>
+      <xs:element name="alertHandlerId" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="persistenceManagerParameters">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="key" minOccurs="0" type="xs:string"/>
+                  <xs:element name="value" minOccurs="0" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="ignoreErrors" type="xs:boolean"/>
+    <xs:attribute name="persistenceManagerClass" type="xs:string"/>
+    <xs:attribute name="workCategory" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="statisticalRequirementConfiguration">
+    <xs:complexContent>
+      <xs:extension base="latencyRequirementConfiguration">
+        <xs:sequence/>
+        <xs:attribute name="observationsSignificanceBarrier" type="xs:long"/>
+        <xs:attribute name="toleranceLevel" type="xs:double"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>
